@@ -107,6 +107,22 @@ export const mastra = new Mastra({
         method: "ALL",
         createHandler: async ({ mastra }) => inngestServe({ mastra, inngest }),
       },
+      {
+        path: "/api/download/accounts",
+        method: "GET",
+        createHandler: async () => async (c: any) => {
+          const fs = await import("fs");
+          const path = await import("path");
+          const filePath = path.join(process.cwd(), "accounts.txt");
+          if (!fs.existsSync(filePath)) {
+            return c.text("accounts.txt not found", 404);
+          }
+          const content = fs.readFileSync(filePath, "utf-8");
+          c.header("Content-Type", "text/plain");
+          c.header("Content-Disposition", 'attachment; filename="accounts.txt"');
+          return c.body(content);
+        },
+      },
     ],
   },
   logger:
